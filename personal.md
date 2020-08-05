@@ -144,42 +144,21 @@ $ kubectl apply -f commission.yaml
 
 * 숙소 예약 
 ![p1](https://user-images.githubusercontent.com/66579960/89418970-c1bbbc00-d76b-11ea-91f6-600d3901244b.jpg)
+```
+* 결과 확인
+![p2](https://user-images.githubusercontent.com/66579960/89418971-c1bbbc00-d76b-11ea-86f5-16db6adccc02.jpg)
+![p5](https://user-images.githubusercontent.com/66579960/89418975-c2ece900-d76b-11ea-863e-b41a1ea5c5aa.jpg)
 
 ```
-
-```
-
-
-* 예약 확인 (siege 에서)
-```
-http http://booking:8080/bookings/1
-```
-
 # 검증1) 동기식 호출 과 Fallback 처리
-- 숙소 등록시 인증 서비스를 동기식으로 호출하고 있음.
+- 숙소 등록시 수수료 서비스를 동기식으로 호출하고 있음.
 - 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 인증시스템이 장애가 나면 숙소 등록을 못받는다는 것을 확인
 
 * 인증 서비스 중지
 ```
-$ kubectl delete -f auth.yaml
-
-(POD 상태)
-NAME                           READY   STATUS    RESTARTS   AGE
-pod/alarm-77cd9d57-fj6dm       2/2     Running   0          78m
-pod/booking-7ffd5f9d75-lwhq8   2/2     Running   0          78m
-pod/gateway-7885fb4994-whvw8   2/2     Running   0          79m
-pod/html-6fbc78fb49-t7dd8      2/2     Running   0          78m
-pod/mypage-595b95dbf5-x5xgt    2/2     Running   0          78m
-pod/pay-6ddbb7d4dd-c847f       2/2     Running   0          78m
-pod/review-7cfb746cbb-682ks    2/2     Running   0          78m
-pod/room-6448f765fc-jsbgr      2/2     Running   0          78m
-pod/siege                      2/2     Running   0          79m
-```
+$ kubectl delete -f commission.yaml
 
 * 숙소 등록 에러 확인 (siege 에서)
-```
-http POST http://room:8080/rooms name=호텔1 price=1000 address=서울 host=Superman
-http POST http://room:8080/rooms name=펜션1 price=1000 address=양평 host=Superman
 
 (처리에러)
 HTTP/1.1 500 Internal Server Error
@@ -198,177 +177,44 @@ x-envoy-upstream-service-time: 10042
 }
 ```
 
-* 인증 서비스 기동
+* 수수료 서비스 기동
 ```
-$ kubectl apply -f auth.yaml
+$ kubectl apply -f comission.yaml
 
-(POD 상태)
-NAME                       READY   STATUS    RESTARTS   AGE
-alarm-77cd9d57-fj6dm       2/2     Running   0          80m
-auth-5d4c8cd986-7v4v8      2/2     Running   0          83s       <===
-booking-7ffd5f9d75-lwhq8   2/2     Running   0          80m
-gateway-7885fb4994-whvw8   2/2     Running   0          81m
-html-6fbc78fb49-t7dd8      2/2     Running   0          81m
-mypage-595b95dbf5-x5xgt    2/2     Running   0          80m
-pay-6ddbb7d4dd-c847f       2/2     Running   0          80m
-review-7cfb746cbb-682ks    2/2     Running   0          80m
-room-6448f765fc-jsbgr      2/2     Running   0          80m
-siege                      2/2     Running   0          81m
 ```
 
-* 숙소 등록 성공 확인 (siege 에서)
-```
-http POST http://room:8080/rooms name=호텔2 price=1000 address=서울 host=Superman
-http POST http://room:8080/rooms name=펜션2 price=1000 address=양평 host=Superman
+* 숙소 등록 성공 확인
 
-(처리)
-HTTP/1.1 201 Created
-content-type: application/json;charset=UTF-8
-date: Wed, 05 Aug 2020 12:36:58 GMT
-location: http://room:8080/rooms/10
-server: envoy
-transfer-encoding: chunked
-x-envoy-upstream-service-time: 57
 
-{
-    "_links": {
-        "room": {
-            "href": "http://room:8080/rooms/10"
-        },
-        "self": {
-            "href": "http://room:8080/rooms/10"
-        }
-    },
-    "address": "서울",
-    "host": "Superman",
-    "name": "호텔2",
-    "price": 1000
-}
 ```
 
 # 검증2) 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 
-- 숙소가 등록된 후에 알림 처리는 동기식이 아니라 비동기식으로 처리하여 알림 시스템의 처리를 위하여 등록 블로킹 되지 않아도록 처리한다.
+- 숙소가 예약된 후 취소처리 시 수수료 취소는 비동기식
 
-* 알림 서비스 중지
+* 숙소 서비스 중지
 ```
-kubectl delete -f alarm.yaml
+kubectl delete -f comission.yaml
 
-(POD 상태)
-NAME                       READY   STATUS        RESTARTS   AGE
-alarm-77cd9d57-fj6dm       2/2     Terminating   0          83m       <=====
-auth-5d4c8cd986-7v4v8      2/2     Running       0          4m13s
-booking-7ffd5f9d75-lwhq8   2/2     Running       0          83m
-gateway-7885fb4994-whvw8   2/2     Running       0          83m
-html-6fbc78fb49-t7dd8      2/2     Running       0          83m
-mypage-595b95dbf5-x5xgt    2/2     Running       0          83m
-pay-6ddbb7d4dd-c847f       2/2     Running       0          83m
-review-7cfb746cbb-682ks    2/2     Running       0          83m
-room-6448f765fc-jsbgr      2/2     Running       0          83m
-siege                      2/2     Running       0          84m
+![p17](https://user-images.githubusercontent.com/66579960/89419777-c6cd3b00-d76c-11ea-97fc-ccbb586c52f1.jpg)
 ```
 
-* 알림 이력 조회 불가 확인 (siege 에서)
+* 숙소 정상 취소
 ```
-http http://alarm:8080/alarms
+![p7](https://user-images.githubusercontent.com/66579960/89418991-c7b19d00-d76b-11ea-8b79-24f3cced973a.jpg)
 
-(처리에러)
-http: error: ConnectionError: HTTPConnectionPool(host='alarm', port=8080): Max retries exceeded with url: /alarms (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f7230913eb8>: Failed to establish a new connection: [Errno -2] Name or service not known')) while doing GET request to URL: http://alarm:8080/alarms
 ```
 
-* 숙소 등록 성공 확인 (siege 에서)
+* 수수료 서비스 기동
 ```
-http POST http://room:8080/rooms name=호텔3 price=1000 address=서울 host=Superman
-http POST http://room:8080/rooms name=펜션3 price=1000 address=양평 host=Superman
+kubectl apply -f commission.yaml
 
-(처리성공)
-HTTP/1.1 201 Created
-content-type: application/json;charset=UTF-8
-date: Wed, 05 Aug 2020 12:39:25 GMT
-location: http://room:8080/rooms/11
-server: envoy
-transfer-encoding: chunked
-x-envoy-upstream-service-time: 54
-
-{
-    "_links": {
-        "room": {
-            "href": "http://room:8080/rooms/11"
-        },
-        "self": {
-            "href": "http://room:8080/rooms/11"
-        }
-    },
-    "address": "서울",
-    "host": "Superman",
-    "name": "호텔3",
-    "price": 1000
-}
 ```
 
-* 알림 서비스 기동
+* 수수료 취소 이력 조회
 ```
-kubectl apply -f alarm.yaml
+![p10](https://user-images.githubusercontent.com/66579960/89418998-c84a3380-d76b-11ea-84e9-78b53570963f.jpg)
 
-(POD 상태)
-NAME                       READY   STATUS    RESTARTS   AGE
-alarm-77cd9d57-96r4k       1/2     Running   0          5s          <==================
-auth-5d4c8cd986-7v4v8      2/2     Running   0          6m43s
-booking-7ffd5f9d75-lwhq8   2/2     Running   0          86m
-gateway-7885fb4994-whvw8   2/2     Running   0          86m
-html-6fbc78fb49-t7dd8      2/2     Running   0          86m
-mypage-595b95dbf5-x5xgt    2/2     Running   0          85m
-pay-6ddbb7d4dd-c847f       2/2     Running   0          86m
-review-7cfb746cbb-682ks    2/2     Running   0          85m
-room-6448f765fc-jsbgr      2/2     Running   0          86m
-siege                      2/2     Running   0          86m
-```
-
-* 알림 이력 조회 성송 확인 (siege 에서)
-```
-http http://alarm:8080/alarms 
-
-(처리성공)
-HTTP/1.1 200 OK
-content-type: application/hal+json;charset=UTF-8
-date: Wed, 05 Aug 2020 12:41:56 GMT
-server: envoy
-transfer-encoding: chunked
-x-envoy-upstream-service-time: 390
-
-{
-    "_embedded": {
-        "alarms": [
-            {
-                "_links": {
-                    "alarm": {
-                        "href": "http://alarm:8080/alarms/1"
-                    },
-                    "self": {
-                        "href": "http://alarm:8080/alarms/1"
-                    }
-                },
-                "message": "AuthApproved",
-                "receiver": "(host)Superman"
-            }
-        ]
-    },
-    "_links": {
-        "profile": {
-            "href": "http://alarm:8080/profile/alarms"
-        },
-        "self": {
-            "href": "http://alarm:8080/alarms{?page,size,sort}",
-            "templated": true
-        }
-    },
-    "page": {
-        "number": 0,
-        "size": 20,
-        "totalElements": 1,
-        "totalPages": 1
-    }
-}
 ```
 
 # 검증3) 동기식 호출 / 서킷 브레이킹 / 장애격리
@@ -380,114 +226,50 @@ x-envoy-upstream-service-time: 390
 kubectl label namespace mybnb istio-injection=enabled
 ```
 
-* 숙소등록 부하 발생 (siege 에서) - 동시사용자 10명, 60초 동안 실시
+* 수수료 부하 발생 (siege 에서) - 동시사용자 100명, 60초 동안 실시
 ```
-$ siege -v -c10 -t60S -r10 --content-type "application/json" 'http://room:8080/rooms POST {"name":"호텔4", "price":1000, "address":"서울", "host":"Superman"}'
+$ siege -v -c100 -t60S -r10 --content-type "application/json" 'http://commission:8080/commissions/1 PUT {"bookId":19, "payId":"7", "price":1000, "charge":"10", "status":"CommissionPayed"}'
 ```
 
 * 서킷 브레이킹을 위한 DestinationRule 적용
 ```
-$ cd ~/jihwancha/mybnb2/yaml
-$ kubectl apply -f dr-auth.yaml
+$ kubectl apply -f dr-commission.yaml
+
 ```
 
 * 서킷 브레이킹 확인 (siege 에서)
 ```
-HTTP/1.1 500     0.08 secs:     247 bytes ==> POST http://room:8080/rooms
-HTTP/1.1 500     0.11 secs:     247 bytes ==> POST http://room:8080/rooms
-HTTP/1.1 500     0.08 secs:     247 bytes ==> POST http://room:8080/rooms
-HTTP/1.1 500     0.06 secs:     247 bytes ==> POST http://room:8080/rooms
+![p13](https://user-images.githubusercontent.com/66579960/89419003-c97b6080-d76b-11ea-8d94-edde8f11d08e.jpg)
 ...
-
-Transactions:                    634 hits
-Availability:                  38.03 %
-Elapsed time:                  21.48 secs
-Data transferred:               0.39 MB
-Response time:                  0.34 secs
-Transaction rate:              29.52 trans/sec
-Throughput:                     0.02 MB/sec
-Concurrency:                    9.96
-Successful transactions:         634
-Failed transactions:            1033
-Longest transaction:            0.54
-Shortest transaction:           0.01
 ```
 
 * 서킷 브레이킹 확인 (kiali 화면)
-![cb](https://user-images.githubusercontent.com/61722732/89416771-b915b680-d768-11ea-9560-b242e617c245.PNG)
 
 
 * 서킷 브레이킹을 위한 DestinationRule 제거
 ```
-$ cd ~/jihwancha/mybnb2/yaml
-$ kubectl delete -f dr-auth.yaml
 ```
-
-* 숙소등록 부하 발생 (siege 에서) - 동시사용자 10명, 60초 동안 실시
-```
-$ siege -v -c10 -t60S -r10 --content-type "application/json" 'http://room:8080/rooms POST {"name":"호텔5", "price":1000, "address":"서울", "host":"Superman"}'
-```
-
-* 정상 동작 확인 (siege 에서)
-```
-...
-
-Transactions:                   5306 hits
-Availability:                 100.00 %                <=================
-Elapsed time:                  59.05 secs
-Data transferred:               1.22 MB
-Response time:                  0.11 secs
-Transaction rate:              89.86 trans/sec
-Throughput:                     0.02 MB/sec
-Concurrency:                    9.93
-Successful transactions:        5306
-Failed transactions:               0
-Longest transaction:            0.48
-Shortest transaction:           0.01
-```
-
 
 # 검증4) 오토스케일 아웃
 - 인증 서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 3개까지 늘려준다:
 
 * HPA 적용
 ```
-$ kubectl autoscale deploy auth -n mybnb --min=1 --max=3 --cpu-percent=15
+$ kubectl autoscale deploy commission -n mybnb --min=1 --max=3 --cpu-percent=15
 $ kubectl get deploy auth -n mybnb -w 
 ```
 
-* 숙소등록 부하 발생 (siege 에서) - 동시사용자 10명, 180초 동안 실시
+* 수수료 부하 발생 (siege 에서) - 동시사용자 100명, 180초 동안 실시
 ```
-$ siege -v -c10 -t180S -r10 --content-type "application/json" 'http://room:8080/rooms POST {"name":"호텔6", "price":1000, "address":"서울", "host":"Superman"}'
+$ siege -v -c100 -t180S -r10 --content-type "application/json" 'http://commission:8080/commissions/1 PUT {"bookId":19, "payId":"7", "price":1000, "charge":"10", "status":"CommissionPayed"}'
 ```
+![p14](https://user-images.githubusercontent.com/66579960/89419004-ca13f700-d76b-11ea-857b-bf39c10c561d.jpg)
 
-* 정상 동작 확인 (siege 에서)
-```
-...
-Transactions:                  20932 hits
-Availability:                 100.00 %             <==========================
-Elapsed time:                 179.13 secs
-Data transferred:               4.87 MB
-Response time:                  0.08 secs
-Transaction rate:             116.85 trans/sec
-Throughput:                     0.03 MB/sec
-Concurrency:                    9.77
-Successful transactions:       20932
-Failed transactions:               0
-Longest transaction:            3.69
-Shortest transaction:           0.00
 ```
 
 * 스케일 아웃 확인
 ```
-NAME   READY   UP-TO-DATE   AVAILABLE   AGE
-auth   1/1     1            1           15m
-auth   1/3     1            1           16m
-auth   1/3     1            1           16m
-auth   1/3     1            1           16m
-auth   1/3     3            1           16m
-auth   2/3     3            2           18m
-auth   3/3     3            3           18m
+![p16](https://user-images.githubusercontent.com/66579960/89419009-caac8d80-d76b-11ea-84fa-29c6f8bc8f67.jpg)
 ```
 
 
