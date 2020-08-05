@@ -262,7 +262,7 @@ $ kubectl get deploy auth -n mybnb -w
 * 수수료 부하 발생 (siege 에서) - 동시사용자 100명, 180초 동안 실시
 ```
 $ siege -v -c100 -t180S -r10 --content-type "application/json" 'http://commission:8080/commissions/1 PUT {"bookId":19, "payId":"7", "price":1000, "charge":"10", "status":"CommissionPayed"}'
-```
+
 ![p14](https://user-images.githubusercontent.com/66579960/89419004-ca13f700-d76b-11ea-857b-bf39c10c561d.jpg)
 
 ```
