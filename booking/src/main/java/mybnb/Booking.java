@@ -122,6 +122,7 @@ public class Booking {
         BeanUtils.copyProperties(this, bookCanceled);
         bookCanceled.setStatus("BookCanceled");
         bookCanceled.publishAfterCommit();
+
     }
 
 }

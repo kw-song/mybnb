@@ -31,7 +31,7 @@
                 if(mypages.length < 1 ){
                     $('#tblMypages > tbody:last-child')
                         .append($('<tr>').attr('style', 'text-align:center;')
-                            .append($('<td>').attr('colspan', '12').text('NO DATA'))
+                            .append($('<td>').attr('colspan', '13').text('NO DATA'))
                         );
                 }
                 else {
@@ -56,6 +56,7 @@
                                 .append($('<td>').text(mypage.address))
                                 .append($('<td>').text(mypage.host))
                                 .append($('<td>').append($('<a>').attr({class: 'Button bg-red', href: "javascript:openReviewAddView('"+mypage.status+"','"+mypage.bookId+"')"}).text('리뷰작성')))
+                                .append($('<td>').text(mypage.charge))
                             );
                     }
                 }
@@ -63,7 +64,7 @@
             error: function (status) {
                 $('#tblMypages > tbody:last-child')
                     .append($('<tr>').attr('style', 'text-align:center; color:red;')
-                        .append($('<td>').attr('colspan', '12').text('조회 실패'))
+                        .append($('<td>').attr('colspan', '13').text('조회 실패'))
                     );
              }
         });
@@ -93,6 +94,7 @@
                 <li class="selected"><a href="mypages.html">마이페이지</a></li>
                 <!--<li><a href="reviews.html">리뷰이력</a></li>-->
                 <li><a href="alarms.html">알림이력</a></li>
+                <li><a href="commissions.html">수수료</a></li>
             </ul>
         </nav>
     </div>
@@ -128,6 +130,7 @@
                             <th>숙소 주소</th>
                             <th>숙소 호스트</th>
                             <th>리뷰작성하기</th>
+                            <th>수수료</th>
                         </tr>
                         </thead>
                         <tbody>

@@ -2,6 +2,8 @@ package mybnb;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -103,6 +105,7 @@ public class Payment {
 
     @PostPersist
     public void onPostPersist(){
+
         if("PayApproved".equals(getStatus())) {
             PayApproved payApproved = new PayApproved();
             BeanUtils.copyProperties(this, payApproved);
@@ -117,6 +120,23 @@ public class Payment {
                 e.printStackTrace();
             }
             */
+            mybnb.external.Commission commission = new mybnb.external.Commission();
+            commission.setPayId(getId());
+            commission.setPrice(getPrice());
+            commission.setBookId(getBookId());
+            BigDecimal charge = BigDecimal.ZERO;
+            charge = BigDecimal.valueOf(getPrice()).multiply(BigDecimal.valueOf(0.01));
+            commission.setCharge(charge.floatValue());
+            commission.setStatus("CommissionRequested");
+
+            // mappings goes here
+            try {
+                PayApplication.applicationContext.getBean(mybnb.external.CommissionService.class)
+                        .commissionRequest(commission);
+            }catch(Exception e) {
+                throw new RuntimeException("수수료 서비스 호출 실패입니다.");
+            }
+
         }
         else if("PayCanceled".equals(getStatus())) {
             PayCanceled payCanceled = new PayCanceled();

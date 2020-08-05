@@ -20,6 +20,7 @@ public class Mypage {
     private String usedate;
     private Integer score;
     private String status;
+    private Float charge;
 
     public Long getId() {
         return id;
@@ -107,5 +108,14 @@ public class Mypage {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    // 개인과제
+    public Float getCharge() {
+        return charge;
+    }
+
+    public void setCharge(Float charge) {
+        this.charge = charge;
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -34,6 +35,9 @@ public class MypageViewHandler {
                 mypage.setGuest(booked.getGuest());
                 mypage.setUsedate(booked.getUsedate());
                 mypage.setStatus(booked.getStatus());
+                BigDecimal charge = BigDecimal.ZERO;
+                charge = BigDecimal.valueOf(mypage.getPrice()).multiply(BigDecimal.valueOf(0.01));
+                mypage.setCharge(charge.floatValue());
 
                 // view 레파지 토리에 save
                 mypageRepository.save(mypage);
@@ -53,6 +57,7 @@ public class MypageViewHandler {
                 for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
                     mypage.setStatus(bookCanceled.getStatus());
+                    mypage.setCharge(Float.valueOf(0));
                     // view 레파지 토리에 save
                     mypageRepository.save(mypage);
                 }
@@ -88,6 +93,25 @@ public class MypageViewHandler {
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
                     mypage.setScore(reviewRegistered.getScore());
                     mypage.setStatus(reviewRegistered.getStatus());
+                    // view 레파지 토리에 save
+                    mypageRepository.save(mypage);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    // 개인과제
+    @StreamListener(KafkaProcessor.INPUT)
+    public void whenReviewRegistered_then_UPDATE_4(@Payload CommissionCharged commissionCharged) {
+        try {
+            if (commissionCharged.isMe()) {
+                // view 객체 조회
+                List<Mypage> mypageList = mypageRepository.findByBookId(commissionCharged.getBookId());
+                for(Mypage mypage : mypageList){
+                    // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setStatus(commissionCharged.getStatus());
                     // view 레파지 토리에 save
                     mypageRepository.save(mypage);
                 }

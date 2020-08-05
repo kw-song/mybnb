@@ -24,24 +24,19 @@ spring:
                   serde: org.apache.kafka.common.serialization.Serdes$StringSerde
       bindings:
         event-in:
-          group: pay
+          group: commission
           destination: mybnb
           contentType: application/json
         event-out:
           destination: mybnb
           contentType: application/json
 
-api:
-  url:
-    commission: http://localhost:8088
-
-
 logging:
   level:
     org.hibernate.type: trace
     org.springframework.cloud: debug
 server:
-  port: 8083
+  port: 8088
 ---
 
 spring:
@@ -61,13 +56,9 @@ spring:
                   serde: org.apache.kafka.common.serialization.Serdes$StringSerde
       bindings:
         event-in:
-          group: pay
+          group: commission
           destination: mybnb
           contentType: application/json
         event-out:
           destination: mybnb
           contentType: application/json
-
-api:
-  url:
-    commission: http://commssion:8080
