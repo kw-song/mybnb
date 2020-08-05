@@ -142,34 +142,13 @@ $ kubectl apply -f commission.yaml
 * 화면
 - http://a37129e7032f641e69219a10e58e79d5-1497029974.ap-northeast-2.elb.amazonaws.com:8080/html/index.html
 
-* siege 접속
-```
-kubectl exec -it siege -n mybnb -- /bin/bash
-apt-get update
-apt-get install httpie
+* 숙소 예약 
+![p1](https://user-images.githubusercontent.com/66579960/89418970-c1bbbc00-d76b-11ea-91f6-600d3901244b.jpg)
+
 ```
 
-* 숙소 등록 
-```
-http POST http://room:8080/rooms name=호텔 price=1000 address=서울 host=Superman
-http POST http://room:8080/rooms name=펜션 price=1000 address=양평 host=Superman
-http POST http://room:8080/rooms name=민박 price=1000 address=강릉 host=Superman
 ```
 
-* 숙소 확인 (siege 에서)
-```
-http http://room:8080/rooms
-```
-
-* 인증 확인 (siege 에서)
-```
-http http://auth:8080/auths
-```
-
-* 예약 (siege 에서)
-```
-http POST http://booking:8080/bookings roomId=1 name=호텔 price=1000 address=서울 host=Superman guest=배트맨 usedate=20201010
-```
 
 * 예약 확인 (siege 에서)
 ```
