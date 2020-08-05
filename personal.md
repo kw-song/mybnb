@@ -2,19 +2,19 @@
 
 * EKS Cluster create
 ```
-$ eksctl create cluster --name skccuser22-cluster --version 1.15 --nodegroup-name standard-workers --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 4
+$ eksctl create cluster --name skccuer10-Cluster --version 1.15 --nodegroup-name standard-workers --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 4
 ```
 
 * EKS Cluster settings
 ```
-$ aws eks --region ap-northeast-2 update-kubeconfig --name skccuser22-cluster
+$ aws eks --region ap-northeast-2 update-kubeconfig --name skccuer10-Cluster
 $ kubectl config current-context
 $ kubectl get all
 ```
 
 * ECR 인증
 ```
-$ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com
+$ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com
 ```
 
 * Metric Server 설치
@@ -51,7 +51,7 @@ $ kubectl get pod -n istio-system
 $ kubectl edit service/kiali -n istio-system
 
 - type 변경 : ClusterIP -> LoadBalancer
-- (접속주소) http://aaa1acc40ce7e4255b8ce9098a68f927-1757157123.ap-northeast-2.elb.amazonaws.com:20001
+- (접속주소) http://http://ac5885beaca174095bad6d5f5779a443-1156063200.ap-northeast-2.elb.amazonaws.com:20001/kiali
 ```
 
 * Namespace 생성
@@ -70,85 +70,77 @@ $ kubectl label namespace mybnb istio-injection=enabled
 
 * ECR image repository
 ```
-$ aws ecr create-repository --repository-name skccuser22-gateway --region ap-northeast-2
-$ aws ecr create-repository --repository-name skccuser22-html --region ap-northeast-2
-$ aws ecr create-repository --repository-name skccuser22-room --region ap-northeast-2
-$ aws ecr create-repository --repository-name skccuser22-booking --region ap-northeast-2
-$ aws ecr create-repository --repository-name skccuser22-pay --region ap-northeast-2
-$ aws ecr create-repository --repository-name skccuser22-mypage --region ap-northeast-2
-$ aws ecr create-repository --repository-name skccuser22-review --region ap-northeast-2
-$ aws ecr create-repository --repository-name skccuser22-alarm --region ap-northeast-2
-$ aws ecr create-repository --repository-name skccuser22-auth --region ap-northeast-2
+$ aws ecr create-repository --repository-name user10-mybnb-gateway --region ap-northeast-2
+$ aws ecr create-repository --repository-name user10-mybnb-room --region ap-northeast-2
+$ aws ecr create-repository --repository-name user10-mybnb-booking --region ap-northeast-2
+$ aws ecr create-repository --repository-name user10-mybnb-pay --region ap-northeast-2
+$ aws ecr create-repository --repository-name user10-mybnb-mypage --region ap-northeast-2
+$ aws ecr create-repository --repository-name user10-mybnb-alarm --region ap-northeast-2
+$ aws ecr create-repository --repository-name user10-mybnb-html --region ap-northeast-2
+$ aws ecr create-repository --repository-name user10-mybnb-commission --region ap-northeast-2
 ```
 
 * image build & push
 ```
-$ cd ~/jihwancha/mybnb2/gateway
-$ mvn clean package
-$ docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-gateway:latest .
-$ docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-gateway:latest
+$ cd gateway
+$ mvn package
+$ docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-gateway:latest .
+$ docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-gateway:latest
 
-$ cd ~/jihwancha/mybnb2/html
-$ mvn clean package
-$ docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-html:latest .
-$ docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-html:latest
+$ cd ../room
+$ mvn package
+$ docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-room:latest .
+$ docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-room:latest
 
-$ cd ~/jihwancha/mybnb2/room
-$ mvn clean package
-$ docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-room:latest .
-$ docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-room:latest
+$ cd ../booking
+$ mvn package
+$ docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-booking:latest .
+$ docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-booking:latest
 
-$ cd ~/jihwancha/mybnb2/booking
-$ mvn clean package
-$ docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-booking:latest .
-$ docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-booking:latest
+$ cd ../pay
+$ mvn package
+$ docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-pay:latest .
+$ docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-pay:latest
 
-$ cd ~/jihwancha/mybnb2/pay
-$ mvn clean package
-$ docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-pay:latest .
-$ docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-pay:latest
+$ cd ../mypage
+$ mvn package
+$ docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-mypage:latest .
+$ docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-mypage:latest
 
-$ cd ~/jihwancha/mybnb2/mypage
-$ mvn clean package
-$ docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-mypage:latest .
-$ docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-mypage:latest
+$ cd ../alarm
+$ mvn package
+$ docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-alarm:latest .
+$ docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-alarm:latest
 
-$ cd ~/jihwancha/mybnb2/review
-$ mvn clean package
-$ docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-review:latest .
-$ docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-review:latest
+$ cd ../html
+$ mvn package
+$ docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-html:latest .
+$ docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-html:latest
 
-$ cd ~/jihwancha/mybnb2/alarm
-$ mvn clean package
-$ docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-alarm:latest .
-$ docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-alarm:latest
-
-$ cd ~/jihwancha/mybnb2/auth
-$ mvn clean package
-$ docker build -t 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-auth:latest .
-$ docker push 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/skccuser22-auth:latest
+$ cd ../commission
+$ mvn package
+$ docker build -t 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-commission:latest .
+$ docker push 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-commission:latest
 ```
 
 * Deploy
 ```
-$ cd ~/jihwancha/mybnb2/yaml
-kubectl apply -f siege.yaml
-kubectl apply -f configmap.yaml
-kubectl apply -f gateway.yaml
-kubectl apply -f html.yaml
-kubectl apply -f room.yaml
-kubectl apply -f booking.yaml
-kubectl apply -f pay.yaml
-kubectl apply -f mypage.yaml
-kubectl apply -f alarm.yaml
-kubectl apply -f review.yaml
-kubectl apply -f auth.yaml
+$ kubectl apply -f siege.yaml
+$ kubectl apply -f configmap.yaml
+$ kubectl apply -f gateway.yaml
+$ kubectl apply -f html.yaml
+$ kubectl apply -f room.yaml
+$ kubectl apply -f booking.yaml
+$ kubectl apply -f pay.yaml
+$ kubectl apply -f mypage.yaml
+$ kubectl apply -f alarm.yaml
+$ kubectl apply -f commission.yaml
 ```
 
 # 사전 검증
 
 * 화면
-- http://a2cd95eb5dfa547c290e7c877e07d62c-1371768300.ap-northeast-2.elb.amazonaws.com:8080/html/index.html
+- http://a37129e7032f641e69219a10e58e79d5-1497029974.ap-northeast-2.elb.amazonaws.com:8080/html/index.html
 
 * siege 접속
 ```
@@ -157,7 +149,7 @@ apt-get update
 apt-get install httpie
 ```
 
-* 숙소 등록 (siege 에서)
+* 숙소 등록 
 ```
 http POST http://room:8080/rooms name=호텔 price=1000 address=서울 host=Superman
 http POST http://room:8080/rooms name=펜션 price=1000 address=양평 host=Superman
