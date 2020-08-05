@@ -17,16 +17,10 @@ spec:
     spec:
       containers:
         - name: commission
-          image: 496278789073.dkr.ecr.ap-northeast-2.amazonaws.com/mybnb-commission:latest
+          image: 052937454741.dkr.ecr.ap-northeast-2.amazonaws.com/user10-mybnb-commission:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
-          env:
-            - name: api.url.payment
-              valueFrom:
-                configMapKeyRef:
-                  name: mybnb-config
-                  key: api.url.payment
           readinessProbe:
             httpGet:
               path: '/actuator/health'
