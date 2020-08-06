@@ -146,15 +146,17 @@ $ kubectl apply -f commission.yaml
 # 사전 검증
 
 * 화면
-- http://a37129e7032f641e69219a10e58e79d5-1497029974.ap-northeast-2.elb.amazonaws.com:8080/html/index.html
+- http://a53e98cf040714291aee2a9a41b17b39-1458229494.ap-northeast-2.elb.amazonaws.com:8080/html/index.html
 
 * 숙소 예약 
-![p1](https://user-images.githubusercontent.com/66579960/89418970-c1bbbc00-d76b-11ea-91f6-600d3901244b.jpg)
 ```
+```
+![p1](https://user-images.githubusercontent.com/66579960/89418970-c1bbbc00-d76b-11ea-91f6-600d3901244b.jpg)
+
 * 결과 확인
 ![p2](https://user-images.githubusercontent.com/66579960/89418971-c1bbbc00-d76b-11ea-86f5-16db6adccc02.jpg)
 ![p5](https://user-images.githubusercontent.com/66579960/89418975-c2ece900-d76b-11ea-863e-b41a1ea5c5aa.jpg)
-
+```
 ```
 # 검증1) 동기식 호출 과 Fallback 처리
 - 숙소 등록시 수수료 서비스를 동기식으로 호출하고 있음.
@@ -163,9 +165,9 @@ $ kubectl apply -f commission.yaml
 * 인증 서비스 중지
 ```
 $ kubectl delete -f commission.yaml
-
+```
 * 숙소 등록 에러 확인 (siege 에서)
-
+```
 (처리에러)
 HTTP/1.1 500 Internal Server Error
 content-type: application/json;charset=UTF-8
@@ -186,39 +188,32 @@ x-envoy-upstream-service-time: 10042
 * 수수료 서비스 기동
 ```
 $ kubectl apply -f comission.yaml
-
 ```
 
 * 숙소 등록 성공 확인
 
-
 ```
-
 # 검증2) 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 
 - 숙소가 예약된 후 취소처리 시 수수료 취소는 비동기식
-
+```
 * 숙소 서비스 중지
 ```
 kubectl delete -f comission.yaml
-
+```
 ![p17](https://user-images.githubusercontent.com/66579960/89419777-c6cd3b00-d76c-11ea-97fc-ccbb586c52f1.jpg)
 ```
-
 * 숙소 정상 취소
 ```
 ![p7](https://user-images.githubusercontent.com/66579960/89418991-c7b19d00-d76b-11ea-8b79-24f3cced973a.jpg)
 
-```
 
 * 수수료 서비스 기동
 ```
-kubectl apply -f commission.yaml
-
+$ kubectl apply -f commission.yaml
 ```
-
 * 수수료 취소 이력 조회
-```
+
 ![p10](https://user-images.githubusercontent.com/66579960/89418998-c84a3380-d76b-11ea-84e9-78b53570963f.jpg)
 
 ```
@@ -226,7 +221,7 @@ kubectl apply -f commission.yaml
 # 검증3) 동기식 호출 / 서킷 브레이킹 / 장애격리
 - 서킷 브레이킹 프레임워크의 선택: istio-injection + DestinationRule
 - 숙소 등록시 동기로 호출되는 인증 서비스에 설정
-
+```
 * istio-injection 적용 (기 적용완료)
 ```
 kubectl label namespace mybnb istio-injection=enabled
@@ -240,21 +235,13 @@ $ siege -v -c100 -t60S -r10 --content-type "application/json" 'http://commission
 * 서킷 브레이킹을 위한 DestinationRule 적용
 ```
 $ kubectl apply -f dr-commission.yaml
-
 ```
 
 * 서킷 브레이킹 확인 (siege 에서)
-```
 ![p13](https://user-images.githubusercontent.com/66579960/89419003-c97b6080-d76b-11ea-8d94-edde8f11d08e.jpg)
-...
-```
-
-* 서킷 브레이킹 확인 (kiali 화면)
-
-
-* 서킷 브레이킹을 위한 DestinationRule 제거
 ```
 ```
+
 
 # 검증4) 오토스케일 아웃
 - 인증 서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 3개까지 늘려준다:
@@ -268,15 +255,14 @@ $ kubectl get deploy auth -n mybnb -w
 * 수수료 부하 발생 (siege 에서) - 동시사용자 100명, 180초 동안 실시
 ```
 $ siege -v -c100 -t180S -r10 --content-type "application/json" 'http://commission:8080/commissions/1 PUT {"bookId":19, "payId":"7", "price":1000, "charge":"10", "status":"CommissionPayed"}'
-
+```
 ![p14](https://user-images.githubusercontent.com/66579960/89419004-ca13f700-d76b-11ea-857b-bf39c10c561d.jpg)
 
-```
+
 
 * 스케일 아웃 확인
-```
 ![p16](https://user-images.githubusercontent.com/66579960/89419009-caac8d80-d76b-11ea-84fa-29c6f8bc8f67.jpg)
-```
+
 
 
 # 검증5) 무정지 재배포
@@ -308,8 +294,8 @@ siege                      2/2     Running       0          100m
 ```
 
 * 에러 발생 확인
-```
 ![p19](https://user-images.githubusercontent.com/66579960/89477450-40dedd80-d7c8-11ea-9e2c-9729aff1eb61.jpg)
+```
 ```
 
 * 수수료조회 부하 발생 (siege 에서) - 동시사용자 1명, 300초 동안 실시
@@ -320,10 +306,10 @@ siege -v -c100 -t180S -r10 --content-type "application/json" 'http://commission:
 * 수수료 이미지 update (readness, liveness 설정 상태)
 ```
 $ kubectl apply -f commission.yaml
-
 ```
 
 * 정상 실행 확인 (siege 에서)
-```
+
 ![p18](https://user-images.githubusercontent.com/66579960/89477448-3fadb080-d7c8-11ea-975c-cc20a25e3a21.jpg)
+```
 ```
