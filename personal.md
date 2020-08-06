@@ -72,6 +72,26 @@ $ kubectl label namespace mybnb istio-injection=enabled
 - (설정해제 : kubectl label namespace mybnb istio-injection=disabled --overwrite)
 ```
 
+* siege deploy
+```
+cd mybnb/yaml
+kubectl apply -f siege.yaml 
+kubectl exec -it siege -n mybnb -- /bin/bash
+apt-get update
+apt-get install httpie
+```
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: siege
+  namespace: mybnb
+spec:
+  containers:
+    - name: siege
+      image: apexacme/siege-nginx
+```
 # Build & Deploy
 
 * ECR image repository
