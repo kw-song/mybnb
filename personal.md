@@ -171,6 +171,7 @@ $ kubectl delete -f commission.yaml
 ```
 * 예약 에러 확인
 ![p22](https://user-images.githubusercontent.com/66579960/89478951-830a1e00-d7cc-11ea-9452-47d355781fc3.jpg)
+![p23](https://user-images.githubusercontent.com/66579960/89478955-83a2b480-d7cc-11ea-9ad3-a402edbe4fa0.jpg)
 ```
 ```
 
