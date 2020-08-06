@@ -159,30 +159,19 @@ $ kubectl apply -f commission.yaml
 ```
 ```
 # 검증1) 동기식 호출 과 Fallback 처리
-- 숙소 등록시 수수료 서비스를 동기식으로 호출하고 있음.
-- 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 인증시스템이 장애가 나면 숙소 등록을 못받는다는 것을 확인
+- 예약 시 결제 서비스(동기)에 이어 수수료 서비스를 동기식으로 호출하고 있음.
+- 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하며, 수수료 시스템이 장애가 나면 예약 등록을 못받는다는 것을 확인
 
-* 인증 서비스 중지
+* 수수료 서비스 중지
 ```
 $ kubectl delete -f commission.yaml
 ```
-* 숙소 등록 에러 확인 (siege 에서)
+![p21](https://user-images.githubusercontent.com/66579960/89478950-82718780-d7cc-11ea-8f96-8f4030c855ef.jpg)
 ```
-(처리에러)
-HTTP/1.1 500 Internal Server Error
-content-type: application/json;charset=UTF-8
-date: Wed, 05 Aug 2020 12:33:03 GMT
-server: envoy
-transfer-encoding: chunked
-x-envoy-upstream-service-time: 10042
-
-{
-    "error": "Internal Server Error",
-    "message": "Could not commit JPA transaction; nested exception is javax.persistence.RollbackException: Error while committing the transaction",
-    "path": "/rooms",
-    "status": 500,
-    "timestamp": "2020-08-05T12:33:03.761+0000"
-}
+```
+* 예약 에러 확인
+![p22](https://user-images.githubusercontent.com/66579960/89478951-830a1e00-d7cc-11ea-9452-47d355781fc3.jpg)
+```
 ```
 
 * 수수료 서비스 기동
@@ -190,38 +179,39 @@ x-envoy-upstream-service-time: 10042
 $ kubectl apply -f comission.yaml
 ```
 
-* 숙소 등록 성공 확인
-
+* 예약 성공 확인
+![p29](https://user-images.githubusercontent.com/66579960/89479159-0f1c4580-d7cd-11ea-9395-3f0456e64a8f.jpg)
+```
 ```
 # 검증2) 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 
 - 숙소가 예약된 후 취소처리 시 수수료 취소는 비동기식
-```
-* 숙소 서비스 중지
+
+* 수수료 서비스 중지
 ```
 kubectl delete -f comission.yaml
 ```
-![p17](https://user-images.githubusercontent.com/66579960/89419777-c6cd3b00-d76c-11ea-97fc-ccbb586c52f1.jpg)
-```
-* 숙소 정상 취소
-```
-![p7](https://user-images.githubusercontent.com/66579960/89418991-c7b19d00-d76b-11ea-8b79-24f3cced973a.jpg)
 
+* 예약 정상 취소
+![p24](https://user-images.githubusercontent.com/66579960/89478956-843b4b00-d7cc-11ea-899d-7067a7fb7bf8.jpg)
+![p25](https://user-images.githubusercontent.com/66579960/89478957-843b4b00-d7cc-11ea-874a-d7c1bf04562e.jpg)
+
+```
+```
 
 * 수수료 서비스 기동
 ```
 $ kubectl apply -f commission.yaml
 ```
 * 수수료 취소 이력 조회
-
-![p10](https://user-images.githubusercontent.com/66579960/89418998-c84a3380-d76b-11ea-84e9-78b53570963f.jpg)
-
+![p28](https://user-images.githubusercontent.com/66579960/89478961-856c7800-d7cc-11ea-8c4e-21e9fe3098e7.jpg)
+```
 ```
 
 # 검증3) 동기식 호출 / 서킷 브레이킹 / 장애격리
 - 서킷 브레이킹 프레임워크의 선택: istio-injection + DestinationRule
 - 숙소 등록시 동기로 호출되는 인증 서비스에 설정
-```
+
 * istio-injection 적용 (기 적용완료)
 ```
 kubectl label namespace mybnb istio-injection=enabled
@@ -257,13 +247,13 @@ $ kubectl get deploy auth -n mybnb -w
 $ siege -v -c100 -t180S -r10 --content-type "application/json" 'http://commission:8080/commissions/1 PUT {"bookId":19, "payId":"7", "price":1000, "charge":"10", "status":"CommissionPayed"}'
 ```
 ![p14](https://user-images.githubusercontent.com/66579960/89419004-ca13f700-d76b-11ea-857b-bf39c10c561d.jpg)
-
-
+```
+```
 
 * 스케일 아웃 확인
 ![p16](https://user-images.githubusercontent.com/66579960/89419009-caac8d80-d76b-11ea-84fa-29c6f8bc8f67.jpg)
-
-
+```
+```
 
 # 검증5) 무정지 재배포
 
