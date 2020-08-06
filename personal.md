@@ -196,7 +196,7 @@ kubectl delete -f comission.yaml
 * 예약 정상 취소
 ![p24](https://user-images.githubusercontent.com/66579960/89478956-843b4b00-d7cc-11ea-899d-7067a7fb7bf8.jpg)
 ![p25](https://user-images.githubusercontent.com/66579960/89478957-843b4b00-d7cc-11ea-874a-d7c1bf04562e.jpg)
-
+![p26](https://user-images.githubusercontent.com/66579960/89478959-84d3e180-d7cc-11ea-9a98-936b68057ed1.jpg)
 ```
 ```
 
