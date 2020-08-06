@@ -1,3 +1,9 @@
+# 모델링
+
+* 이벤트스토밍
+![modeling](https://user-images.githubusercontent.com/66579960/89418966-c08a8f00-d76b-11ea-8343-feec7b4cf444.jpg)
+
+
 # 환경구성
 
 * EKS Cluster create
@@ -275,14 +281,14 @@ $ siege -v -c100 -t180S -r10 --content-type "application/json" 'http://commissio
 
 # 검증5) 무정지 재배포
 
-* 리뷰조회 부하 발생 (siege 에서) - 동시사용자 1명, 300초 동안 실시
+* 수수료조회 부하 발생 (siege 에서) - 동시사용자 1명, 300초 동안 실시
 ```
-siege -v -c1 -t300S -r10 --content-type "application/json" 'http://review:8080/reviews'
+siege -v -c100 -t180S -r10 --content-type "application/json" 'http://commission:8080/commissions/1 PUT {"bookId":19, "payId":"7", "price":1000, "charge":"10", "status":"CommissionPayed"}'
 ```
 
-* 리뷰 이미지 update (readness, liveness 미설정 상태)
+* 수수료 이미지 update (readness, liveness 미설정 상태)
 ```
-$ kubectl apply -f review_na.yaml
+$ kubectl apply -f comission-na.yaml
 
 (POD 상태)
 NAME                       READY   STATUS        RESTARTS   AGE
@@ -301,63 +307,23 @@ room-6448f765fc-jsbgr      2/2     Running       0          99m
 siege                      2/2     Running       0          100m
 ```
 
-* 에러 발생 확인 (siege 에서)
+* 에러 발생 확인
 ```
-Transactions:                   4700 hits
-Availability:                  82.11 %              <=======================
-Elapsed time:                  31.22 secs
-Data transferred:               3.39 MB
-Response time:                  0.01 secs
-Transaction rate:             150.54 trans/sec
-Throughput:                     0.11 MB/sec
-Concurrency:                    0.96
-Successful transactions:        4700
-Failed transactions:            1024
-Longest transaction:            0.08
-Shortest transaction:           0.00
+![p19](https://user-images.githubusercontent.com/66579960/89477450-40dedd80-d7c8-11ea-9e2c-9729aff1eb61.jpg)
 ```
 
-* 리뷰조회 부하 발생 (siege 에서) - 동시사용자 1명, 300초 동안 실시
+* 수수료조회 부하 발생 (siege 에서) - 동시사용자 1명, 300초 동안 실시
 ```
-siege -v -c1 -t300S -r10 --content-type "application/json" 'http://review:8080/reviews'
+siege -v -c100 -t180S -r10 --content-type "application/json" 'http://commission:8080/commissions/1 PUT {"bookId":19, "payId":"7", "price":1000, "charge":"10", "status":"CommissionPayed"}'
 ```
 
-* 리뷰 이미지 update (readness, liveness 설정 상태)
+* 수수료 이미지 update (readness, liveness 설정 상태)
 ```
-$ kubectl apply -f review.yaml
+$ kubectl apply -f commission.yaml
 
-(POD 상태)
-NAME                       READY   STATUS    RESTARTS   AGE
-alarm-77cd9d57-96r4k       2/2     Running   0          15m
-auth-5d4c8cd986-7v4v8      2/2     Running   0          22m
-auth-5d4c8cd986-9vtht      2/2     Running   0          5m15s
-auth-5d4c8cd986-lmdp2      2/2     Running   0          5m15s
-booking-7ffd5f9d75-lwhq8   2/2     Running   0          101m
-gateway-7885fb4994-whvw8   2/2     Running   0          101m
-html-6fbc78fb49-t7dd8      2/2     Running   0          101m
-mypage-595b95dbf5-x5xgt    2/2     Running   0          101m
-pay-6ddbb7d4dd-c847f       2/2     Running   0          101m
-review-69957988c6-4sdfd    2/2     Running   0          108s
-review-7cfb746cbb-ttv8s    1/2     Running   0          11s       <=========
-room-6448f765fc-jsbgr      2/2     Running   0          101m
-siege                      2/2     Running   0          102m
 ```
 
 * 정상 실행 확인 (siege 에서)
 ```
-...
-Transactions:                  23586 hits
-Availability:                 100.00 %              <======================
-Elapsed time:                  98.46 secs
-Data transferred:               7.85 MB
-Response time:                  0.00 secs
-Transaction rate:             239.55 trans/sec
-Throughput:                     0.08 MB/sec
-Concurrency:                    0.96
-Successful transactions:       23586
-Failed transactions:               0
-Longest transaction:            0.72
-Shortest transaction:           0.00
+![p18](https://user-images.githubusercontent.com/66579960/89477448-3fadb080-d7c8-11ea-975c-cc20a25e3a21.jpg)
 ```
-
-
